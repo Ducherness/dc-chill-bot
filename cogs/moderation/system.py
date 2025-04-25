@@ -336,3 +336,4 @@ class SystemCog(commands.Cog, name="System Cog"):
 
 async def setup(bot: ChillBot):
     await bot.add_cog(SystemCog(bot))
+    
