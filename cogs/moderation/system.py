@@ -22,17 +22,20 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def perm(self, interaction: Interaction, member: Member, lvl: int = 0):
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.curator.values())) and interaction.user.id not in self.bot.owner_ids:
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
 
         if member is None:
-            return await interaction.response.send_message(embed=Embed(description="Вы не указали пользователя, которому хотите изменить права!"), delete_after=15)
-        
+            await interaction.response.send_message(embed=Embed(description="Вы не указали пользователя, которому хотите изменить права!"), delete_after=15)
+            return
+
         if lvl < 0 or lvl > 4:
-            return await interaction.response.send_message(embed=Embed(description="Указано некорректное значение прав!"), delete_after=15)
-        
+            await interaction.response.send_message(embed=Embed(description="Указано некорректное значение прав!"), delete_after=15)
+            return
+
         if lvl >= user_permission and interaction.user.id not in self.bot.owner_ids:
-            return await interaction.response.send_message(embed=Embed(description="Вы не можете выдавать данные уровень прав!"), delete_after=15)
-    
+            await interaction.response.send_message(embed=Embed(description="Вы не можете выдавать данные уровень прав!"), delete_after=15)
+            return
+
         await set_permissions(self.bot, member, lvl)
         await interaction.response.send_message(embed=Embed(description=f"Успешно установлен уровень прав **` {lvl} `** пользователю **{member}** `[{member.id}]`"))
 
@@ -42,7 +45,8 @@ class SystemCog(commands.Cog, name="System Cog"):
     @has_access(manage_messages=True)
     async def clear(self, interaction: Interaction, amount: int, member: Member = None) -> None:
         if amount <= 0 or amount > 100:
-            return await interaction.response.send_message("❌ Количество сообщений должно быть от 1 до 100.", ephemeral=True)
+            await interaction.response.send_message("❌ Количество сообщений должно быть от 1 до 100.", ephemeral=True)
+            return
 
         await interaction.response.defer()
 
@@ -75,13 +79,15 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def kick(self, interaction: Interaction, member: Member, reason: str = "Не указана") -> None:
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.moderator.values())):
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            return
 
         if user_permission < next(iter(Config.Roles.chief_moderator.values())):
             remaining_time = await is_cooldown(self.bot, "local", "kick", interaction.user.id)
             if remaining_time is not None:
                 minutes, seconds = divmod(remaining_time, 60)
-                return await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                return
             else:
                 await set_cooldown(self.bot, "local", "kick", interaction.user.id, 60)
 
@@ -120,13 +126,15 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def ban(self, interaction: Interaction, member: Member, duration: str, reason: str = "Не указана") -> None:
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.moderator.values())):
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            return
 
         if user_permission < next(iter(Config.Roles.chief_moderator.values())):
             remaining_time = await is_cooldown(self.bot, "local", "ban", interaction.user.id)
             if remaining_time is not None:
                 minutes, seconds = divmod(remaining_time, 60)
-                return await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                return
             else:
                 await set_cooldown(self.bot, "local", "ban", interaction.user.id, 60)
 
@@ -178,13 +186,15 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def unban(self, interaction: Interaction, member: Member, reason: str = "Не указана") -> None:
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.moderator.values())):
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            return
 
         if user_permission < next(iter(Config.Roles.curator.values())):
             remaining_time = await is_cooldown(self.bot, "local", "unban", interaction.user.id)
             if remaining_time is not None:
                 minutes, seconds = divmod(remaining_time, 60)
-                return await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                return
             else:
                 await set_cooldown(self.bot, "local", "unban", interaction.user.id, 60)
 
@@ -224,13 +234,15 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def mute(self, interaction: Interaction, member: Member, duration: str, reason: str = "Не указана") -> None:
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.helper.values())):
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            return
 
         if user_permission < next(iter(Config.Roles.moderator.values())):
             remaining_time = await is_cooldown(self.bot, "local", "mute", interaction.user.id)
             if remaining_time is not None:
                 minutes, seconds = divmod(remaining_time, 60)
-                return await interaction.response.send_messagey(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                await interaction.response.send_messagey(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                return
             else:
                 await set_cooldown(self.bot, "local", "mute", interaction.user.id, 30)
             
@@ -281,13 +293,15 @@ class SystemCog(commands.Cog, name="System Cog"):
     async def unmute(self, interaction: Interaction, member: Member, reason: str = "Не указана") -> None:
         user_permission = await get_permissions(self.bot, interaction.user)
         if user_permission < next(iter(Config.Roles.helper.values())):
-            return await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            await interaction.response.send_message(embed=Embed(description="У вас недостаточно прав для выполнения данной команды!"), delete_after=15)
+            return
 
         if user_permission < next(iter(Config.Roles.moderator.values())):
             remaining_time = await is_cooldown(self.bot, "local", "unmute", interaction.user.id)
             if remaining_time is not None:
                 minutes, seconds = divmod(remaining_time, 60)
-                return await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                await interaction.response.send_message(embed=Embed(description=f"**Подождите `{minutes}` мин `{seconds}` сек перед повторным использованием команды!**"), delete_after=15)
+                return
             else:
                 await set_cooldown(self.bot, "local", "unmute", interaction.user.id, 30)
 
