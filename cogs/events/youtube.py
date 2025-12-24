@@ -6,7 +6,7 @@ import os
 from core import ChillBot
 from discord.ext import commands, tasks
 
-YOUTUBE_API_KEY = "AIzaSyAl45IQYYrs6O3E4GHAIAWsHeHyx512yjk"
+YOUTUBE_API_KEY = "."
 
 YOUTUBE_CHANNELS = {
     "RedelOff": "UCQdX7MkmEpVluxJHy32zvXg",
